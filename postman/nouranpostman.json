@@ -1,0 +1,104 @@
+{
+  "info": {
+    "name": "package tracking",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [{ "key": "token", "value": "" }],
+  "item": [
+    {
+      "name": "nouran",
+      "item": [
+        {
+          "name": "register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"name\":\"nour\",\"email\":\"nouran@gmail.com\",\"phone\":\"01012345678\",\"password\":\"123456\"}" },
+            "url": { "raw": "http://localhost:5001/api/users/register", "protocol": "http", "host": ["localhost"], "port": "5001", "path": ["api", "users", "register"] }
+          }
+        },
+        {
+          "name": "register email already used",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"name\":\"sara\",\"email\":\"sara@gmail.com\",\"phone\":\"01012345678\",\"password\":\"123456\"}" },
+            "url": { "raw": "http://localhost:5001/api/users/register", "protocol": "http", "host": ["localhost"], "port": "5001", "path": ["api", "users", "register"] }
+          }
+        },
+        {
+          "name": "register missing name",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"name\":\"\",\"email\":\"test@gmail.com\",\"phone\":\"01012345678\",\"password\":\"123456\"}" },
+            "url": { "raw": "http://localhost:5001/api/users/register", "protocol": "http", "host": ["localhost"], "port": "5001", "path": ["api", "users", "register"] }
+          }
+        },
+        {
+          "name": "login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var data = pm.response.json();",
+                  "pm.collectionVariables.set(\"token\", data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\":\"sara@gmail.com\",\"password\":\"123456\"}" },
+            "url": { "raw": "http://localhost:5001/api/users/login", "protocol": "http", "host": ["localhost"], "port": "5001", "path": ["api", "users", "login"] }
+          }
+        },
+        {
+          "name": "login wrong password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\":\"sara@gmail.com\",\"password\":\"wrongpass\"}" },
+            "url": { "raw": "http://localhost:5001/api/users/login", "protocol": "http", "host": ["localhost"], "port": "5001", "path": ["api", "users", "login"] }
+          }
+        },
+        {
+          "name": "create order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"pickup\":\"giza\",\"dropoff\":\"cairo\",\"details\":\"shoes small box\",\"deliverytime\":\"2026-12-01T14:00\"}" },
+            "url": { "raw": "http://localhost:5002/api/orders", "protocol": "http", "host": ["localhost"], "port": "5002", "path": ["api", "orders"] }
+          }
+        },
+        {
+          "name": "create order no token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"pickup\":\"giza\",\"dropoff\":\"cairo\",\"details\":\"shoes\",\"deliverytime\":\"2026-12-01T14:00\"}" },
+            "url": { "raw": "http://localhost:5002/api/orders", "protocol": "http", "host": ["localhost"], "port": "5002", "path": ["api", "orders"] }
+          }
+        },
+        {
+          "name": "create order missing field",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"pickup\":\"\",\"dropoff\":\"cairo\",\"details\":\"shoes\",\"deliverytime\":\"2026-12-01T14:00\"}" },
+            "url": { "raw": "http://localhost:5002/api/orders", "protocol": "http", "host": ["localhost"], "port": "5002", "path": ["api", "orders"] }
+          }
+        }
+      ]
+    }
+  ]
+}
