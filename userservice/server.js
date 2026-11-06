@@ -1,20 +1,23 @@
-const express = require("express")
+const express = require("express") ;
 const cors = require("cors")
-require("dotenv").config()
+require("dotenv").config() 
 const db = require("./db")
 const routes = require("./routes")
 
-const app = express()
+const app = express() ;
+
 app.use(cors())
-app.use(express.json())
+app.use(express.json()) ;
+
 
 app.use("/api/users", routes)
 
 // test the database connection
 db.query("select 1")
-  .then(() => console.log("database connected"))
-  .catch((err) => console.log("database error:", err.message))
+   .then(() => console.log("database connected"))
+  .catch((err) => console.log("database error:", err.message)) ;
+
 
 app.listen(process.env.PORT, () => {
-   console.log("userservice running on port " + process.env.PORT)
+    console.log("userservice running on port " + process.env.PORT) ;
 })

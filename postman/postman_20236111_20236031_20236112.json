@@ -1,0 +1,1194 @@
+{
+  "info": {
+    "name": "postman_20236111_20236031_20236112",
+    "description": "SLB 423 Package Tracking System (Phase 1) - Complete Automated API Test Collection for all 10 Features (User, Courier, and Admin roles).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrlUser",
+      "value": "http://localhost:5001/api/users"
+    },
+    {
+      "key": "baseUrlOrder",
+      "value": "http://localhost:5002/api/orders"
+    },
+    {
+      "key": "userToken",
+      "value": ""
+    },
+    {
+      "key": "courierToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "deliverOrderId",
+      "value": "1"
+    },
+    {
+      "key": "declineOrderId",
+      "value": "1"
+    },
+    {
+      "key": "cancelOrderId",
+      "value": "1"
+    },
+    {
+      "key": "testOrderId",
+      "value": "1"
+    },
+    {
+      "key": "uniqueEmail",
+      "value": "customer_auto@test.com"
+    },
+    {
+      "key": "adminDeleteId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication (Features #1 & #2)",
+      "item": [
+        {
+          "name": "Feature 1 - Register User",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"uniqueEmail\", \"customer_\" + Date.now() + \"@test.com\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Customer\",\n  \"email\": \"{{uniqueEmail}}\",\n  \"phone\": \"01012345678\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlUser}}/register",
+              "host": [
+                "{{baseUrlUser}}"
+              ],
+              "path": [
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 1 - Register (Validation Error: Short Password)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Customer\",\n  \"email\": \"customer2@test.com\",\n  \"phone\": \"01012345678\",\n  \"password\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlUser}}/register",
+              "host": [
+                "{{baseUrlUser}}"
+              ],
+              "path": [
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 1 - Register (Duplicate Email Error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Customer\",\n  \"email\": \"admin@gmail.com\",\n  \"phone\": \"01012345678\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlUser}}/register",
+              "host": [
+                "{{baseUrlUser}}"
+              ],
+              "path": [
+                "register"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 2 - Login as User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "if (data.token) { pm.collectionVariables.set(\"userToken\", data.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@test.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlUser}}/login",
+              "host": [
+                "{{baseUrlUser}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 2 - Login as Courier",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "if (data.token) { pm.collectionVariables.set(\"courierToken\", data.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"courier1@gmail.com\",\n  \"password\": \"courier123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlUser}}/login",
+              "host": [
+                "{{baseUrlUser}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 2 - Login as Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "if (data.token) { pm.collectionVariables.set(\"adminToken\", data.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlUser}}/login",
+              "host": [
+                "{{baseUrlUser}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 2 - Login (Invalid Credentials Error)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlUser}}/login",
+              "host": [
+                "{{baseUrlUser}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Customer Orders (Features #3, #4, #5, #6)",
+      "item": [
+        {
+          "name": "Feature 4 - Create Order (For Delivery Progression)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "if (data.order && data.order.id) {",
+                  "    pm.collectionVariables.set(\"deliverOrderId\", data.order.id);",
+                  "    pm.collectionVariables.set(\"testOrderId\", data.order.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickup\": \"22 Nile Street, Giza\",\n  \"dropoff\": \"15 Tahrir Square, Cairo\",\n  \"details\": \"Fragile glassware in bubble wrap\",\n  \"deliverytime\": \"2028-12-01T15:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlOrder}}",
+              "host": [
+                "{{baseUrlOrder}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 4 - Create Order (For Courier Decline)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "if (data.order && data.order.id) {",
+                  "    pm.collectionVariables.set(\"declineOrderId\", data.order.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickup\": \"Maadi, Cairo\",\n  \"dropoff\": \"New Cairo\",\n  \"details\": \"Spare auto parts box\",\n  \"deliverytime\": \"2028-12-02T11:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlOrder}}",
+              "host": [
+                "{{baseUrlOrder}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 4 - Create Order (For Customer Cancel)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "if (data.order && data.order.id) {",
+                  "    pm.collectionVariables.set(\"cancelOrderId\", data.order.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickup\": \"Mohandeseen, Giza\",\n  \"dropoff\": \"Heliopolis, Cairo\",\n  \"details\": \"Books package\",\n  \"deliverytime\": \"2028-12-03T16:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlOrder}}",
+              "host": [
+                "{{baseUrlOrder}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 4 - Create Order (Validation Error: Past Delivery Time)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickup\": \"Giza\",\n  \"dropoff\": \"Cairo\",\n  \"details\": \"Shoes\",\n  \"deliverytime\": \"2020-01-01T10:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlOrder}}",
+              "host": [
+                "{{baseUrlOrder}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 5 - Get My Orders (Logged-in User)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is an array of orders\", function () {",
+                  "    var data = pm.response.json();",
+                  "    pm.expect(Array.isArray(data)).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrlOrder}}",
+              "host": [
+                "{{baseUrlOrder}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 6 - Get Order Details by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "pm.expect(data.id).to.eql(Number(pm.collectionVariables.get(\"deliverOrderId\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrlOrder}}/{{deliverOrderId}}",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "{{deliverOrderId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 6 - Cancel Pending Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "pm.expect(data.order.status).to.eql(\"Cancelled\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrlOrder}}/{{cancelOrderId}}/cancel",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "{{cancelOrderId}}",
+                "cancel"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Courier Deliveries (Features #7 & #8)",
+      "item": [
+        {
+          "name": "Feature 7 - Courier Accept Order",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Ensure deliverOrderId is assigned to courier (id 2) by admin before accepting",
+                  "pm.sendRequest({",
+                  "    url: pm.collectionVariables.get(\"baseUrlOrder\") + \"/admin/\" + pm.collectionVariables.get(\"deliverOrderId\") + \"/assign\",",
+                  "    method: \"PUT\",",
+                  "    header: {",
+                  "        \"Content-Type\": \"application/json\",",
+                  "        \"Authorization\": \"Bearer \" + pm.collectionVariables.get(\"adminToken\")",
+                  "    },",
+                  "    body: {",
+                  "        mode: \"raw\",",
+                  "        raw: JSON.stringify({ courierid: 2 })",
+                  "    }",
+                  "}, function (err, res) {});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "pm.expect(data.order.status).to.eql(\"Accepted\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{courierToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrlOrder}}/{{deliverOrderId}}/accept",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "{{deliverOrderId}}",
+                "accept"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 7 - Courier Decline Order",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Ensure declineOrderId is assigned to courier (id 2) by admin before declining",
+                  "pm.sendRequest({",
+                  "    url: pm.collectionVariables.get(\"baseUrlOrder\") + \"/admin/\" + pm.collectionVariables.get(\"declineOrderId\") + \"/assign\",",
+                  "    method: \"PUT\",",
+                  "    header: {",
+                  "        \"Content-Type\": \"application/json\",",
+                  "        \"Authorization\": \"Bearer \" + pm.collectionVariables.get(\"adminToken\")",
+                  "    },",
+                  "    body: {",
+                  "        mode: \"raw\",",
+                  "        raw: JSON.stringify({ courierid: 2 })",
+                  "    }",
+                  "}, function (err, res) {});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "pm.expect(data.order.status).to.eql(\"Declined\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{courierToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrlOrder}}/{{declineOrderId}}/decline",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "{{declineOrderId}}",
+                "decline"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 7 - Get Assigned Orders for Logged-in Courier",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "pm.expect(Array.isArray(data)).to.be.true;"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{courierToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrlOrder}}/assigned",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "assigned"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 8 - Update Status to Picked Up",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "pm.expect(data.order.status).to.eql(\"Picked Up\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{courierToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Picked Up\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlOrder}}/{{deliverOrderId}}/status",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "{{deliverOrderId}}",
+                "status"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 8 - Update Status to In Transit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "pm.expect(data.order.status).to.eql(\"In Transit\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{courierToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"In Transit\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlOrder}}/{{deliverOrderId}}/status",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "{{deliverOrderId}}",
+                "status"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 8 - Update Status to Delivered",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "pm.expect(data.order.status).to.eql(\"Delivered\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{courierToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Delivered\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlOrder}}/{{deliverOrderId}}/status",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "{{deliverOrderId}}",
+                "status"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 8 - Invalid Transition (Error Test)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{courierToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Picked Up\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlOrder}}/{{deliverOrderId}}/status",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "{{deliverOrderId}}",
+                "status"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Admin Operations (Features #9 & #10)",
+      "item": [
+        {
+          "name": "Feature 9 - Get All Orders (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "pm.expect(Array.isArray(data)).to.be.true;"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrlOrder}}/admin/all",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "admin",
+                "all"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 9 - Admin Update Order Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"In Transit\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlOrder}}/admin/{{deliverOrderId}}",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "admin",
+                "{{deliverOrderId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 9 - Admin Delete Order",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Create a fresh order for admin to safely delete without affecting other flows",
+                  "pm.sendRequest({",
+                  "    url: pm.collectionVariables.get(\"baseUrlOrder\"),",
+                  "    method: \"POST\",",
+                  "    header: {",
+                  "        \"Content-Type\": \"application/json\",",
+                  "        \"Authorization\": \"Bearer \" + pm.collectionVariables.get(\"userToken\")",
+                  "    },",
+                  "    body: {",
+                  "        mode: \"raw\",",
+                  "        raw: JSON.stringify({",
+                  "            pickup: \"Temp Pickup\",",
+                  "            dropoff: \"Temp Dropoff\",",
+                  "            details: \"Order to be deleted by Admin\",",
+                  "            deliverytime: \"2028-12-31T18:00\"",
+                  "        })",
+                  "    }",
+                  "}, function (err, res) {",
+                  "    if (!err && res.json() && res.json().order) {",
+                  "        pm.collectionVariables.set(\"adminDeleteId\", res.json().order.id);",
+                  "    }",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "pm.expect(data.message).to.eql(\"order deleted\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrlOrder}}/admin/{{adminDeleteId}}",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "admin",
+                "{{adminDeleteId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 10 - Admin Get Courier Assignments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "pm.expect(Array.isArray(data)).to.be.true;"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrlOrder}}/admin/assignments",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "admin",
+                "assignments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Feature 10 - Admin Assign / Reassign Order to Courier",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var data = pm.response.json();",
+                  "pm.expect(data.order.courierid).to.eql(3);",
+                  "pm.expect(data.order.status).to.eql(\"Assigned\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courierid\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrlOrder}}/admin/{{deliverOrderId}}/assign",
+              "host": [
+                "{{baseUrlOrder}}"
+              ],
+              "path": [
+                "admin",
+                "{{deliverOrderId}}",
+                "assign"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
